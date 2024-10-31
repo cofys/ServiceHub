@@ -297,8 +297,8 @@ class ServiceHub_Admin_Pages {
 
   /**
    * Render the customers page.
-   **/
- public function render_customers_page() {
+   */
+  public function render_customers_page() {
     global $wpdb;
 
     // Get all customers from the database
@@ -327,7 +327,11 @@ class ServiceHub_Admin_Pages {
               echo '<td>' . esc_html( $customer->name ) . '</td>';
               echo '<td>' . esc_html( $customer->email ) . '</td>';
               echo '<td>' . esc_html( $customer->phone ) . '</td>';
-              echo '<td><a href="#">' . esc_html__( 'Edit', 'servicehub' ) . '</a> | <a href="#">' . esc_html__( 'Delete', 'servicehub' ) . '</a></td>';
+              echo '<td>';
+              // Added classes and data attributes for Edit/Delete links
+              echo '<a href="#" class="servicehub-edit-customer" data-customer-id="' . esc_attr( $customer->id ) . '">' . esc_html__( 'Edit', 'servicehub' ) . '</a> | ';
+              echo '<a href="#" class="servicehub-delete-customer" data-customer-id="' . esc_attr( $customer->id ) . '">' . esc_html__( 'Delete', 'servicehub' ) . '</a>';
+              echo '</td>';
               echo '</tr>';
             }
           } else {
@@ -353,6 +357,26 @@ class ServiceHub_Admin_Pages {
           <textarea name="customer_address" id="customer_address"></textarea>
 
           <input type="submit" class="button button-primary" value="<?php esc_attr_e( 'Add Customer', 'servicehub' ); ?>">
+        </form>
+      </div>
+
+      <div id="servicehub-edit-customer-form" style="display: none;">
+        <h2><?php esc_html_e( 'Edit Customer', 'servicehub' ); ?></h2>
+        <form id="edit-customer-form">
+          <input type="hidden" name="customer_id" id="edit_customer_id">
+          <label for="edit_customer_name"><?php esc_html_e( 'Name', 'servicehub' ); ?></label>
+          <input type="text" name="customer_name" id="edit_customer_name" required>
+
+          <label for="edit_customer_email"><?php esc_html_e( 'Email', 'servicehub' ); ?></label>
+          <input type="email" name="customer_email" id="edit_customer_email">
+
+          <label for="edit_customer_phone"><?php esc_html_e( 'Phone', 'servicehub' ); ?></label>
+          <input type="tel" name="customer_phone" id="edit_customer_phone">
+
+          <label for="edit_customer_address"><?php esc_html_e( 'Address', 'servicehub' ); ?></label>
+          <textarea name="customer_address" id="edit_customer_address"></textarea>
+
+          <input type="submit" class="button button-primary" value="<?php esc_attr_e( 'Update Customer', 'servicehub' ); ?>">
         </form>
       </div>
     </div>
@@ -663,12 +687,13 @@ function servicehub_add_invoice_ajax_handler() {
 }
 add_action( 'wp_ajax_servicehub_add_invoice', 'servicehub_add_invoice_ajax_handler' );
 
+
 /**
  * AJAX handler for fetching job data for editing.
  */
 function servicehub_get_job_data_ajax_handler() {
-    // Check nonce for security (you might need to add a nonce for this)
-    // ...
+  // Check nonce for security
+  check_ajax_referer( 'servicehub_get_job_data_nonce', 'nonce' ); 
   
     // Get job ID from AJAX request
     $job_id = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0;
@@ -689,12 +714,12 @@ function servicehub_get_job_data_ajax_handler() {
   }
   add_action( 'wp_ajax_servicehub_get_job_data', 'servicehub_get_job_data_ajax_handler' );
   
-  /**
-   * AJAX handler for updating a job.
-   */
-  function servicehub_update_job_ajax_handler() {
-    // Check nonce for security (you might need to add a nonce for this)
-    // ...
+/**
+ * AJAX handler for updating a job.
+ */
+function servicehub_update_job_ajax_handler() {
+  // Check nonce for security
+  check_ajax_referer( 'servicehub_update_job_nonce', 'nonce' ); 
   
     // Get form data from AJAX request
     $formData = isset( $_POST['formData'] ) ? $_POST['formData'] : '';
@@ -818,12 +843,13 @@ function render_customers_page() {
   }
   add_action( 'wp_ajax_servicehub_update_job', 'servicehub_update_job_ajax_handler' );
   
-  /**
-   * AJAX handler for deleting a job.
-   */
-  function servicehub_delete_job_ajax_handler() {
-    // Check nonce for security (you might need to add a nonce for this)
-    // ...
+/**
+ * AJAX handler for deleting a job.
+ */
+function servicehub_delete_job_ajax_handler() {
+  // Check nonce for security
+  check_ajax_referer( 'servicehub_delete_job_nonce', 'nonce' ); 
+
   
     // Get job ID from AJAX request
     $job_id = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0;
@@ -844,8 +870,9 @@ function render_customers_page() {
  * AJAX handler for fetching customer data for editing.
  */
 function servicehub_get_customer_data_ajax_handler() {
-    // Check nonce for security (you might need to add a nonce for this)
-    // ...
+  // Check nonce for security
+  check_ajax_referer( 'servicehub_get_customer_data_nonce', 'nonce' ); 
+
   
     // Get customer ID from AJAX request
     $customer_id = isset( $_POST['customer_id'] ) ? absint( $_POST['customer_id'] ) : 0;
@@ -867,11 +894,11 @@ function servicehub_get_customer_data_ajax_handler() {
   add_action( 'wp_ajax_servicehub_get_customer_data', 'servicehub_get_customer_data_ajax_handler' );
   
   /**
-   * AJAX handler for updating a customer.
-   */
-  function servicehub_update_customer_ajax_handler() {
-    // Check nonce for security (you might need to add a nonce for this)
-    // ...
+ * AJAX handler for updating a customer.
+ */
+function servicehub_update_customer_ajax_handler() {
+  // Check nonce for security
+  check_ajax_referer( 'servicehub_update_customer_nonce', 'nonce' ); 
   
     // Get form data from AJAX request
     $formData = isset( $_POST['formData'] ) ? $_POST['formData'] : '';
@@ -908,8 +935,8 @@ add_action( 'wp_ajax_servicehub_update_customer', 'servicehub_update_customer_aj
  * AJAX handler for deleting a customer.
  */
 function servicehub_delete_customer_ajax_handler() {
-  // Check nonce for security (you might need to add a nonce for this)
-  // ...
+  // Check nonce for security
+  check_ajax_referer( 'servicehub_delete_customer_nonce', 'nonce' ); 
 
   // Get customer ID from AJAX request
   $customer_id = isset( $_POST['customer_id'] ) ? absint( $_POST['customer_id'] ) : 0;
@@ -930,8 +957,9 @@ add_action( 'wp_ajax_servicehub_delete_customer', 'servicehub_delete_customer_aj
  * AJAX handler for fetching invoice data for editing.
  */
 function servicehub_get_invoice_data_ajax_handler() {
-    // Check nonce for security (you might need to add a nonce for this)
-    // ...
+  // Check nonce for security
+  check_ajax_referer( 'servicehub_get_invoice_data_nonce', 'nonce' ); 
+
   
     // Get invoice ID from AJAX request
     $invoice_id = isset( $_POST['invoice_id'] ) ? absint( $_POST['invoice_id'] ) : 0;
@@ -953,11 +981,11 @@ function servicehub_get_invoice_data_ajax_handler() {
   add_action( 'wp_ajax_servicehub_get_invoice_data', 'servicehub_get_invoice_data_ajax_handler' );
   
   /**
-   * AJAX handler for updating an invoice.
-   */
-  function servicehub_update_invoice_ajax_handler() {
-    // Check nonce for security (you might need to add a nonce for this)
-    // ...
+ * AJAX handler for updating an invoice.
+ */
+function servicehub_update_invoice_ajax_handler() {
+  // Check nonce for security
+  check_ajax_referer( 'servicehub_update_invoice_nonce', 'nonce' ); 
   
     // Get form data from AJAX request
     $formData = isset( $_POST['formData'] ) ? $_POST['formData'] : '';
@@ -992,12 +1020,13 @@ function servicehub_get_invoice_data_ajax_handler() {
   }
   add_action( 'wp_ajax_servicehub_update_invoice', 'servicehub_update_invoice_ajax_handler' );
   
-  /**
-   * AJAX handler for deleting an invoice.
-   */
-  function servicehub_delete_invoice_ajax_handler() {
-    // Check nonce for security (you might need to add a nonce for this)
-    // ...
+ /**
+ * AJAX handler for deleting an invoice.
+ */
+function servicehub_delete_invoice_ajax_handler() {
+  // Check nonce for security
+  check_ajax_referer( 'servicehub_delete_invoice_nonce', 'nonce' ); 
+
   
     // Get invoice ID from AJAX request
     $invoice_id = isset( $_POST['invoice_id'] ) ? absint( $_POST['invoice_id'] ) : 0;
